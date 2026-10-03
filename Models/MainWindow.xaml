@@ -1,0 +1,315 @@
+<Window x:Class="rtc.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:rtc.ViewModels"
+        Title="re_RTC - reMarkable 2 Template Converter"
+        Height="840" Width="1200"
+        WindowStartupLocation="CenterScreen"
+        Background="#0F172A"
+        Foreground="#F8FAFC">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Window.Resources>
+
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top Header Banner -->
+        <Border Grid.Row="0" Background="#1E293B" CornerRadius="8" Padding="16,12" Margin="0,0,0,16" BorderBrush="#334155" BorderThickness="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Background="#D97706" CornerRadius="6" Padding="6,2" Margin="0,0,10,0">
+                            <TextBlock Text="RTC" FontWeight="Bold" FontSize="12" Foreground="White"/>
+                        </Border>
+                        <TextBlock Text="re_RTC • reMarkable 2 Template Converter" FontSize="18" FontWeight="Bold" Foreground="#F8FAFC"/>
+                        <TextBlock Text=" • Bidirectional SVG ⇄ .template" FontSize="13" Foreground="#FBBF24" Margin="8,0,0,2" VerticalAlignment="Bottom"/>
+                    </StackPanel>
+                    <TextBlock Text="Author once at 1×Full standard; procedurally derives 3×4, 4×5, and 5×6 templates. Converts both SVG => .template and .template => SVG."
+                               FontSize="11" Foreground="#94A3B8" Margin="0,4,0,0"/>
+                </StackPanel>
+
+                <!-- 9 Tablet Colors Reference -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                    <TextBlock Text="9 Export Colors:" FontSize="11" Foreground="#94A3B8" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <Border Background="#000000" Width="14" Height="14" CornerRadius="7" Margin="2,0" ToolTip="Black (#000000)" BorderBrush="#475569" BorderThickness="1"/>
+                    <Border Background="#909090" Width="14" Height="14" CornerRadius="7" Margin="2,0" ToolTip="Gray (#909090)" BorderBrush="#475569" BorderThickness="1"/>
+                    <Border Background="#FFFFFF" Width="14" Height="14" CornerRadius="7" Margin="2,0" ToolTip="White (#FFFFFF)" BorderBrush="#475569" BorderThickness="1"/>
+                    <Border Background="#4E69C9" Width="14" Height="14" CornerRadius="7" Margin="2,0" ToolTip="Blue (#4E69C9)" BorderBrush="#475569" BorderThickness="1"/>
+                    <Border Background="#B33E39" Width="14" Height="14" CornerRadius="7" Margin="2,0" ToolTip="Red (#B33E39)" BorderBrush="#475569" BorderThickness="1"/>
+                    <Border Background="#A1D87D" Width="14" Height="14" CornerRadius="7" Margin="2,0" ToolTip="Green (#A1D87D)" BorderBrush="#475569" BorderThickness="1"/>
+                    <Border Background="#F7E851" Width="14" Height="14" CornerRadius="7" Margin="2,0" ToolTip="Yellow (#F7E851)" BorderBrush="#475569" BorderThickness="1"/>
+                    <Border Background="#8BD0E5" Width="14" Height="14" CornerRadius="7" Margin="2,0" ToolTip="Cyan (#8BD0E5)" BorderBrush="#475569" BorderThickness="1"/>
+                    <Border Background="#B782CD" Width="14" Height="14" CornerRadius="7" Margin="2,0" ToolTip="Magenta (#B782CD)" BorderBrush="#475569" BorderThickness="1"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Workspace (Left: Controls, Right: .template & SVG Previews) -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="420"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left Configuration Panel -->
+            <Border Grid.Column="0" Background="#1E293B" CornerRadius="8" Padding="16" Margin="0,0,16,0" BorderBrush="#334155" BorderThickness="1">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <!-- Drag-and-Drop Dropzone -->
+                        <TextBlock Text="SOURCE FILE (SVG OR .TEMPLATE)" FontWeight="SemiBold" FontSize="11" Foreground="#94A3B8" Margin="0,0,0,6"/>
+                        <Border Background="#0F172A" BorderBrush="#D97706" BorderThickness="1.5" CornerRadius="6"
+                                Padding="14" AllowDrop="True" Drop="Border_Drop" DragOver="Border_DragOver" Margin="0,0,0,8" Cursor="Hand">
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock Text="Drag &amp; drop SVG vector or .template file" FontWeight="SemiBold" Foreground="#FBBF24" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Bidirectional conversion: SVG ⇄ .template" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center" Margin="0,2,0,8"/>
+                                <Button Content="Browse File..." Command="{Binding BrowseFileCommand}"
+                                        Background="#334155" Foreground="White" Width="130" Height="26" BorderThickness="0" Cursor="Hand"/>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBox Text="{Binding SelectedFilePath, Mode=OneWay}" IsReadOnly="True" FontSize="11" Foreground="#CBD5E1" Background="#0F172A"
+                                 BorderBrush="#334155" Padding="4" Margin="0,0,0,14"/>
+
+                        <Separator Background="#334155" Margin="0,0,0,14"/>
+
+                        <!-- Standard Matrices (1xFull Master + 3x4, 4x5, 5x6) -->
+                        <Grid Margin="0,0,0,6">
+                            <TextBlock Text="STANDARD MATRICES" FontWeight="SemiBold" FontSize="11" Foreground="#94A3B8"/>
+                            <TextBlock Text="{Binding SlotDimensionsText}" FontSize="10" Foreground="#FBBF24" HorizontalAlignment="Right"/>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button Grid.Column="0" Content="1×Full Master" Command="{Binding SelectPresetCommand}" CommandParameter="1xFull"
+                                    Height="28" Margin="0,0,2,0" Background="#D97706" Foreground="White" FontWeight="Bold" FontSize="10" BorderThickness="0"/>
+                            <Button Grid.Column="1" Content="3 × 4 Grid" Command="{Binding SelectPresetCommand}" CommandParameter="3x4"
+                                    Height="28" Margin="2,0,2,0" Background="#334155" Foreground="White" FontWeight="Medium" FontSize="10" BorderThickness="0"/>
+                            <Button Grid.Column="2" Content="4 × 5 Grid" Command="{Binding SelectPresetCommand}" CommandParameter="4x5"
+                                    Height="28" Margin="2,0,2,0" Background="#334155" Foreground="White" FontWeight="Medium" FontSize="10" BorderThickness="0"/>
+                            <Button Grid.Column="3" Content="5 × 6 Grid" Command="{Binding SelectPresetCommand}" CommandParameter="5x6"
+                                    Height="28" Margin="2,0,0,0" Background="#334155" Foreground="White" FontWeight="Medium" FontSize="10" BorderThickness="0"/>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                                <TextBlock Text="Columns (cols):" FontSize="11" Foreground="#94A3B8" Margin="0,0,0,3"/>
+                                <TextBox Text="{Binding Columns, UpdateSourceTrigger=PropertyChanged}" Height="28" Background="#0F172A" Foreground="#F8FAFC" BorderBrush="#334155" Padding="4"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Margin="6,0,0,0">
+                                <TextBlock Text="Rows (rows):" FontSize="11" Foreground="#94A3B8" Margin="0,0,0,3"/>
+                                <TextBox Text="{Binding Rows, UpdateSourceTrigger=PropertyChanged}" Height="28" Background="#0F172A" Foreground="#F8FAFC" BorderBrush="#334155" Padding="4"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Template Metadata -->
+                        <TextBlock Text="TEMPLATE METADATA" FontWeight="SemiBold" FontSize="11" Foreground="#94A3B8" Margin="0,0,0,6"/>
+                        <TextBlock Text="Template Name:" FontSize="11" Foreground="#94A3B8" Margin="0,0,0,2"/>
+                        <TextBox Text="{Binding TemplateName, UpdateSourceTrigger=PropertyChanged}" Height="28" Background="#0F172A" Foreground="#F8FAFC" BorderBrush="#334155" Padding="4" Margin="0,0,0,8"/>
+
+                        <TextBlock Text="Author:" FontSize="11" Foreground="#94A3B8" Margin="0,0,0,2"/>
+                        <TextBox Text="{Binding Author, UpdateSourceTrigger=PropertyChanged}" Height="28" Background="#0F172A" Foreground="#F8FAFC" BorderBrush="#334155" Padding="4" Margin="0,0,0,8"/>
+
+                        <!-- Orientation Selection (Portrait / Landscape) -->
+                        <TextBlock Text="Orientation (Tablet Screen):" FontSize="11" Foreground="#94A3B8" Margin="0,0,0,4"/>
+                        <Grid Margin="0,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <RadioButton Grid.Column="0" Content="Portrait (1404×1872)" GroupName="OrientationGrp"
+                                         IsChecked="{Binding IsPortrait}" Foreground="#F8FAFC" FontSize="11" Cursor="Hand"/>
+                            <RadioButton Grid.Column="1" Content="Landscape (1872×1404)" GroupName="OrientationGrp"
+                                         IsChecked="{Binding IsLandscape}" Foreground="#38BDF8" FontSize="11" Cursor="Hand"/>
+                        </Grid>
+
+                        <!-- Options & Checkboxes -->
+                        <TextBlock Text="CURVES &amp; COLOR OPTIONS" FontWeight="SemiBold" FontSize="11" Foreground="#94A3B8" Margin="0,0,0,6"/>
+                        <CheckBox IsChecked="{Binding UseParametricScaling}" Content="Use Parametric Scaling: dx + (x)*s" Foreground="#E2E8F0" Margin="0,0,0,6"/>
+                        <CheckBox IsChecked="{Binding PreserveColors}" Content="Preserve 9 Colors for PDF/SVG Export" Foreground="#38BDF8" Margin="0,0,0,6"/>
+                        <CheckBox IsChecked="{Binding SnapGrayscale}" Content="Snap to 5-Step E-Ink Carta Gray" Foreground="#94A3B8" Margin="0,0,0,16"/>
+
+                        <!-- Action Buttons -->
+                        <Button Content="Convert / Apply to Template" Command="{Binding ConvertSvgCommand}"
+                                Height="36" Background="#0284C7" Foreground="White" FontWeight="Bold" FontSize="12" BorderThickness="0" Cursor="Hand" Margin="0,0,0,8"/>
+
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" Content="Save .template" Command="{Binding SaveTemplateCommand}"
+                                    Height="32" Margin="0,0,4,0" Background="#D97706" Foreground="White" FontWeight="SemiBold" FontSize="11" BorderThickness="0" Cursor="Hand"/>
+                            <Button Grid.Column="1" Content="Export as SVG..." Command="{Binding ExportSvgCommand}"
+                                    Height="32" Margin="4,0,0,0" Background="#6366F1" Foreground="White" FontWeight="SemiBold" FontSize="11" BorderThickness="0" Cursor="Hand"/>
+                        </Grid>
+
+                        <Button Content="Export All 4 Sizes (.zip Bundle)" Command="{Binding ExportAllSizesZipCommand}"
+                                Height="32" Background="#10B981" Foreground="White" FontWeight="SemiBold" FontSize="11" BorderThickness="0" Cursor="Hand"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- Right Output Panel: Tablet Simulator vs .template vs SVG and Actions -->
+            <Border Grid.Column="1" Background="#1E293B" CornerRadius="8" Padding="14" BorderBrush="#334155" BorderThickness="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Top Tab Switchers & Actions -->
+                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Content="Tablet Simulator" Command="{Binding SelectRightTabCommand}" CommandParameter="simulator"
+                                    Height="28" Padding="12,0" Margin="0,0,4,0" Background="#0284C7" Foreground="White" FontWeight="Bold" FontSize="11" BorderThickness="0" Cursor="Hand"/>
+                            <Button Content="Template Code (.template)" Command="{Binding SelectRightTabCommand}" CommandParameter="template"
+                                    Height="28" Padding="10,0" Margin="0,0,4,0" Background="#334155" Foreground="White" FontWeight="Medium" FontSize="11" BorderThickness="0" Cursor="Hand"/>
+                            <Button Content="SVG Vector XML (.svg)" Command="{Binding SelectRightTabCommand}" CommandParameter="svg"
+                                    Height="28" Padding="10,0" Margin="0,0,8,0" Background="#334155" Foreground="White" FontWeight="Medium" FontSize="11" BorderThickness="0" Cursor="Hand"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Content="Copy" Command="{Binding CopyJsonCommand}"
+                                    Width="70" Height="28" Background="#334155" Foreground="White" Margin="0,0,6,0" BorderThickness="0" Cursor="Hand"/>
+                            <Button Content="Save .template" Command="{Binding SaveTemplateCommand}"
+                                    Width="105" Height="28" Background="#D97706" Foreground="White" FontWeight="SemiBold" Margin="0,0,6,0" BorderThickness="0" Cursor="Hand"/>
+                            <Button Content="Save .svg" Command="{Binding ExportSvgCommand}"
+                                    Width="85" Height="28" Background="#6366F1" Foreground="White" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Main Display Views -->
+                    <Grid Grid.Row="1">
+                        <!-- 1. Tablet Simulator View -->
+                        <Grid Visibility="{Binding IsSimulatorTabActive, Converter={StaticResource BoolToVis}}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Simulator Sub-Bar: Specs & Zoom -->
+                            <Border Grid.Row="0" Background="#0F172A" CornerRadius="6" Padding="10,6" Margin="0,0,0,8" BorderBrush="#334155" BorderThickness="1">
+                                <Grid>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Ellipse Width="8" Height="8" Fill="#10B981" Margin="0,0,8,0"/>
+                                        <TextBlock Text="reMarkable 2 Screen Simulator" FontWeight="SemiBold" FontSize="11" Foreground="#F8FAFC"/>
+                                        <Border Background="#1E293B" CornerRadius="4" Padding="6,2" Margin="10,0,10,0">
+                                            <TextBlock Text="{Binding SlotDimensionsText}" FontSize="10" Foreground="#FBBF24" FontFamily="Consolas"/>
+                                        </Border>
+                                        <CheckBox IsChecked="{Binding ShowGridGuidelines}" Content="Show Grid Slots" Foreground="#94A3B8" FontSize="11" VerticalAlignment="Center"/>
+                                    </StackPanel>
+
+                                    <!-- Zoom Controls -->
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                        <Button Content="-" Command="{Binding ZoomOutCommand}" Width="24" Height="22" Background="#1E293B" Foreground="White" BorderThickness="0" Cursor="Hand"/>
+                                        <TextBlock Text="{Binding ZoomPercentText}" FontSize="10" Foreground="#CBD5E1" Width="40" TextAlignment="Center" VerticalAlignment="Center" FontFamily="Consolas"/>
+                                        <Button Content="+" Command="{Binding ZoomInCommand}" Width="24" Height="22" Background="#1E293B" Foreground="White" BorderThickness="0" Cursor="Hand"/>
+                                        <Button Content="Fit" Command="{Binding ResetZoomCommand}" Width="32" Height="22" Background="#1E293B" Foreground="White" Margin="4,0,0,0" BorderThickness="0" Cursor="Hand" FontSize="10"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- Simulator Canvas Viewport -->
+                            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="#050B14">
+                                <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Margin="30">
+                                    <Grid.LayoutTransform>
+                                        <ScaleTransform ScaleX="{Binding ZoomScale}" ScaleY="{Binding ZoomScale}"/>
+                                    </Grid.LayoutTransform>
+
+                                    <!-- Realistic reMarkable 2 Hardware Frame Mockup -->
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="28"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Signature Aluminum Left Spine -->
+                                        <Border Grid.Column="0" Background="#94A3B8" CornerRadius="12,0,0,12" BorderBrush="#64748B" BorderThickness="1,1,0,1">
+                                            <Grid>
+                                                <TextBlock Text="reMarkable" Foreground="#334155" FontSize="10" FontWeight="Bold" FontFamily="Segoe UI, Arial"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                    <TextBlock.LayoutTransform>
+                                                        <RotateTransform Angle="-90"/>
+                                                    </TextBlock.LayoutTransform>
+                                                </TextBlock>
+                                            </Grid>
+                                        </Border>
+
+                                        <!-- Tablet Body Shell -->
+                                        <Border Grid.Column="1" Background="#E2E8F0" CornerRadius="0,14,14,0" Padding="20" BorderBrush="#CBD5E1" BorderThickness="0,1,1,1">
+                                            <StackPanel>
+                                                <!-- Inner Glass Bezel -->
+                                                <Border Background="#18181B" CornerRadius="4" Padding="6">
+                                                    <!-- E-Ink Paper Canvas -->
+                                                    <Border Background="#FAF9F5" Width="{Binding TabletNativeWidth}" Height="{Binding TabletNativeHeight}">
+                                                        <Image Source="{Binding PreviewImage}" Width="{Binding TabletNativeWidth}" Height="{Binding TabletNativeHeight}"
+                                                               RenderOptions.BitmapScalingMode="HighQuality"/>
+                                                    </Border>
+                                                </Border>
+
+                                                <!-- Bottom Label -->
+                                                <Grid Margin="0,8,0,0">
+                                                    <TextBlock Text="CANVAS 1.0 • reMarkable 2" FontSize="9" Foreground="#64748B" FontFamily="Consolas"/>
+                                                    <TextBlock Text="{Binding TemplateName}" FontSize="9" Foreground="#475569" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding Orientation}" FontSize="9" Foreground="#64748B" FontFamily="Consolas" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </Grid>
+                            </ScrollViewer>
+                        </Grid>
+
+                        <!-- 2. Template Code (.template) View -->
+                        <Grid Visibility="{Binding IsTemplateTabActive, Converter={StaticResource BoolToVis}}">
+                            <TextBox Text="{Binding JsonOutput, Mode=OneWay}"
+                                     FontFamily="Consolas, Cascadia Code, Courier New" FontSize="11"
+                                     IsReadOnly="True" AcceptsReturn="True" AcceptsTab="True"
+                                     VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                                     Background="#0B1120" Foreground="#FBBF24" BorderBrush="#1E293B" Padding="10"/>
+                        </Grid>
+
+                        <!-- 3. Reconstructed SVG View -->
+                        <Grid Visibility="{Binding IsSvgTabActive, Converter={StaticResource BoolToVis}}">
+                            <TextBox Text="{Binding SvgOutput, Mode=OneWay}"
+                                     FontFamily="Consolas, Cascadia Code, Courier New" FontSize="11"
+                                     IsReadOnly="True" AcceptsReturn="True" AcceptsTab="True"
+                                     VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                                     Background="#0B1120" Foreground="#38BDF8" BorderBrush="#1E293B" Padding="10"/>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Bottom Status Bar -->
+        <Border Grid.Row="2" Background="#1E293B" CornerRadius="6" Padding="12,6" Margin="0,10,0,0" BorderBrush="#334155" BorderThickness="1">
+            <TextBlock Text="{Binding StatusMessage}" Foreground="#FBBF24" FontSize="11"/>
+        </Border>
+    </Grid>
+</Window>

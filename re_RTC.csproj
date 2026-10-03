@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <LangVersion>preview</LangVersion>
+    <RootNamespace>rtc</RootNamespace>
+    <AssemblyName>rtc</AssemblyName>
+    <ApplicationTitle>re_RTC - reMarkable 2 Template Converter</ApplicationTitle>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+
+  <!-- 
+    Minimal MVVM: Zero third-party MVVM packages required!
+    Built on pure .NET 10 LTS primitives:
+    - INotifyPropertyChanged & ICommand bindings with zero model bloat
+    - 1xFull Standard Master with procedural 3x4, 4x5, 5x6 generation
+    - Native System.Xml.Linq for SVG parsing & generation
+    - Native System.Text.Json with polymorphic type discriminators
+    - Bidirectional conversion: SVG <=> reMarkable *.template
+  -->
+
+</Project>
